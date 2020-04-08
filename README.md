@@ -3,7 +3,7 @@
 This project aims to provide a library to make unit testing in C++ based on the standard library for those passionated to the unit testing, software development and C++ standard.
 
 ## Motivation
-At the moment, the c++ standard is really limited regarding on unit testing, to say the less. Reviewing the state of the art, there are some libraries already like boost, GTest+GMock, FakeIt, catch, mettle, cute and many others. However, in terms of the mocking they are significant limited, for instance they can only mock virtual methods and some times a method was not designed as virtual and we are not the developer or maintainer for that method (which is likely when we try to mock something) or we even don't have access to the source code only the binaries.
+At the moment, the C++ standard is really limited so far regarding on unit testing, to say the less. Reviewing the state of the art, there are some libraries already like boost, GTest+GMock, FakeIt, catch, mettle, cute and many others. However, in terms of the mocking they are significant limited, for instance they can only mock virtual methods and some times a method was not designed as virtual and we are not the developer or maintainer for that method (which is likely when we try to mock something) or we even don't have access to the source code only the binaries.
 
 ## Tenets
 * Provide a readable and maintainbale way to write assertions.
@@ -21,6 +21,7 @@ Following subsections try to illustrate with some examples the initial purposed 
 ```C++
 #include <utz/expect.hpp>
 using utz::expect;
+using utz::skip;
 ...
 "Expecting 5 + 7 = 12."
   | expect(sum(5, 7), is::equal, 12);
@@ -28,15 +29,15 @@ using utz::expect;
 "Expecting non-empty collection."
   | expect(collection.size(), is::greater, 0);
 
-[[unlikely]]
+(skip)
 "Expecting country table has the key 'MX'"
   | expect(contries, has::key, 'MX');
 ```
 Sample output for those assertions:
 ```
-[PASSED] Expecting 5 + 7 = 12.
-[FAILED] Expecting non-empty collection.
-[SKIPED] Expecting country table has the key 'MX'
+✔️😄 Expecting 5 + 7 = 12.
+❌😢 Expecting non-empty collection.
+➖😏 Expecting country table has the key 'MX'
 ```
 
 ### Mocking
@@ -44,23 +45,24 @@ Sample output for those assertions:
 #include <utz/mock.hpp>
 #include <utz/expect.hpp>
 using utz::expect;
+using utz::when;
 ...
 utz::mock mymethod(&myclass::mymethod);
 utz::mock logger(&log::error);
 int x = 10, y = 20, z = 30;
-when(mymethod, is::called_with, std::tuple(x, y)).then_return(0);
-when(mymethod, is::called_with, std::tuple(z, x)).then_throw<std::out_of_range>();
+when(mymethod, is::called_with, std::tuple(x, y))->returns(0);
+when(mymethod, is::called_with, std::tuple(z, x))->throws<std::out_of_range>();
 function_under_test(x, y, z);
 
 "Expecting mymethod was called 3 times within function_under_test."
   | expect(mymethod.number_of_calls(), is::equal, 3);
 
-std::sprintf(
-  "The second call (1-index) should be performed with '%d' and '%d' as arguments.", x, y
+std::format(
+  "The second call (1-index) should be performed with '{0}' and '{1}' as arguments.", x, y
 ) | expect(mymethod.arguments_for_call(2), is::equal, std::tuple(x, y));
 
 "The thrown error/exception should be logged."
-  | expect(logger.number_of_calls(), is::equal, 1); 
+  | expect(logger.number_of_calls(), is::equal, 1);
 ```
 Sample output for that test:
 ```
@@ -76,13 +78,13 @@ Sample output for that test:
 using utz::expect;
 ...
 void mytest_for_integer_division(int dividend, int divisor, const utz::behaviour& expected) {
-  sprintf(
-    "Integer division of %d over %d should %s.", dividend, divisor, expected.to_string()
+  std::format(
+    "Integer division of {0} over {1} should {2}.", dividend, divisor, expected.to_string()
   ) | expect(integer_division(dividend, divisor), has::behaviour, expected);
 }
 ...
-utz::suite{
-    utz::test(mytest_for_integer_division, {
+utz::suite {
+    utz::pool {
       {60, 20, utz::returns(3)},
       {10, 40, utz::returns(0)},
       {-1, 40, utz::returns(0)},
@@ -91,10 +93,11 @@ utz::suite{
       {-1, 40, utz::returns(0)},
       {-9, -2, utz::returns(4)},
       { 0, -2, utz::returns(0)},
-      {-9,  0, utz::throws<std::invalid_argument>}},
-    });
-    
-    utz::test(other_test, stream_of_data_provider);
+      {-9,  0, utz::throws<
+        std::invalid_argument>}},
+    } | mytest_for_integer_division;
+
+    utz::pool(stream_of_data_provider) | other_test;
 };
 ```
 That test cases should be generate something like following output:
