@@ -84,20 +84,20 @@ void mytest_for_integer_division(int dividend, int divisor, const utz::behaviour
 }
 ...
 utz::suite {
-    utz::pool {
-      {60, 20, utz::returns(3)},
-      {10, 40, utz::returns(0)},
-      {-1, 40, utz::returns(0)},
-      {-6, -2, utz::returns(3)},
-      {60, -9, utz::returns(6)},
-      {-1, 40, utz::returns(0)},
-      {-9, -2, utz::returns(4)},
-      { 0, -2, utz::returns(0)},
-      {-9,  0, utz::throws<
-        std::invalid_argument>}},
-    } | mytest_for_integer_division;
+  utz::pool {
+    {60, 20, utz::returns(3)},
+    {10, 40, utz::returns(0)},
+    {-1, 40, utz::returns(0)},
+    {-6, -2, utz::returns(3)},
+    {60, -9, utz::returns(6)},
+    {-1, 40, utz::returns(0)},
+    {-9, -2, utz::returns(4)},
+    { 0, -2, utz::returns(0)},
+    {-9,  0, utz::throws<
+      std::invalid_argument>}
+  } | mytest_for_integer_division;
 
-    utz::pool(stream_of_data_provider) | other_test;
+  utz::pool(stream_of_data_provider) | other_test;
 };
 ```
 That test cases should be generate something like following output:
