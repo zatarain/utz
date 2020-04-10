@@ -19,7 +19,7 @@ Following subsections try to illustrate with some examples the initial purposed 
 
 ### Assertions
 ```C++
-#include <utz/expect.hpp>
+#include <utz/assertion.hpp>
 using utz::expect;
 using utz::skip;
 ...
@@ -35,15 +35,15 @@ using utz::skip;
 ```
 Sample output for those assertions:
 ```
-✔️😄 Expecting 5 + 7 = 12.
-❌😢 Expecting non-empty collection.
-➖😏 Expecting country table has the key 'MX'
+✔️ [PASSED] Expecting 5 + 7 = 12. 😄
+❌ [FAILED] Expecting non-empty collection. 😢
+➖ [SKIP'D] Expecting country table has the key 'MX'. 😏
 ```
 
 ### Mocking
 ```C++
 #include <utz/mock.hpp>
-#include <utz/expect.hpp>
+#include <utz/assertion.hpp>
 using utz::expect;
 using utz::when;
 ...
@@ -66,9 +66,9 @@ std::format(
 ```
 Sample output for that test:
 ```
-[PASSED] Expecting mymethod was called 3 times within function_under_test.
-[FAILED] The second call (1-index) should be performed with '10' and '20' as arguments.
-[PASSED] The thrown error/exception should be logged.
+✔️ [PASSED] Expecting mymethod was called 3 times within function_under_test. 😄
+❌ [FAILED] The second call (1-index) should be performed with '10' and '20' as arguments. 😢
+✔️ [PASSED] The thrown error/exception should be logged. 😄
 ```
 
 ### Data Driven Test (DDT)
@@ -103,14 +103,14 @@ utz::suite {
 That test cases should be generate something like following output:
 ```
 ...
-[PASSED] Integer division of 60 over 20 should return 3.
-[FAILED] Integer division of 10 over 40 should return 0.
-[PASSED] Integer division of -1 over 40 should return 0.
-[FAILED] Integer division of -6 over -2 should return 3.
-[PASSED] Integer division of 60 over -9 should return 6.
-[PASSED] Integer division of -1 over 40 should return 0.
-[FAILED] Integer division of -9 over -2 should return 4.
-[PASSED] Integer division of  0 over -2 should return 4.
-[FAILED] Integer division of -9 over  0 should throw 'std::invalid_argument'.
+✔️ [PASSED] Integer division of 60 over 20 should return 3. 😄
+❌ [FAILED] Integer division of 10 over 40 should return 0. 😢
+✔️ [PASSED] Integer division of -1 over 40 should return 0. 😄
+❌ [FAILED] Integer division of -6 over -2 should return 3. 😢
+✔️ [PASSED] Integer division of 60 over -9 should return 6. 😄
+✔️ [PASSED] Integer division of -1 over 40 should return 0. 😄
+❌ [FAILED] Integer division of -9 over -2 should return 4. 😢
+✔️ [PASSED] Integer division of  0 over -2 should return 4. 😄
+❌ [FAILED] Integer division of -9 over  0 should throw 'std::invalid_argument'. 😢
 ...
 ```
