@@ -32,7 +32,7 @@ void operator|(
 	const Descriptor& description,
 	const utz::assertion<ValueUnderTest, Expected...>& assertion
 ) {
-	utz::log << "[" << (assertion() ? "PASSED" : "FAILED") << "] " << description << std::endl;
+	utz::log << (assertion() ? utz::passed : utz::failed) << description << std::endl;
 }
 
 template<typename ValueUnderTest, typename... Expected>
@@ -40,7 +40,7 @@ void operator|(
 	const utz::skip& description,
 	const utz::assertion<ValueUnderTest, Expected...>& assertion
 ) {
-		utz::log << "[SKIPED] " << description.value() << std::endl;
+	utz::log << utz::skiped << description.value() << std::endl;
 }
 
 #endif

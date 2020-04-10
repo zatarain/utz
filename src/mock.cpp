@@ -5,7 +5,7 @@
 
 template<typename Return, typename ...Arguments>
 utz::mock<Return, Arguments...>::mock(const std::function<Return(Arguments...)>&& f): function(f) {
-	std::cout << "\033[1;32m"
+	utz::log << "\033[1;32m"
 		<< "Creating mock for function: " << typeid(f).name()
 		<< "\033[0m" << std::endl;
 }

@@ -1,10 +1,10 @@
 #ifndef MOCK_HEADER
 #define MOCK_HEADER
 
-#include <iostream>
 #include <deque>
 #include <tuple>
 #include <functional>
+#include "logger.hpp"
 
 namespace utz {
 	template<typename Return = void, typename ...Arguments>

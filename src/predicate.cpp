@@ -15,10 +15,10 @@ bool utz::predicate<Arguments...>::operator()(Arguments... arguments) {
 }
 
 namespace utz::is {
-	template<typename Comparable>
-	utz::predicate<Comparable, Comparable> equal([](
-		Comparable actual,
-		Comparable expected
+	template<typename Actual = void, typename Expected = Actual>
+	utz::predicate<Actual, Expected> equal([](
+		const Actual& actual,
+		const Expected& expected
 	) -> bool { return actual == expected; });
 }
 

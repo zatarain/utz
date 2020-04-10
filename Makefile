@@ -1,4 +1,4 @@
-OBJECTS := src/mock.cpp src/assertion.cpp src/predicate.cpp
+OBJECTS := src/logger.cpp src/predicate.cpp src/mock.cpp src/assertion.cpp
 #PROJECTS:= `find * -name "main.cpp" | sed -r 's/\/[^\/]+$$//'`
 CXXFLAGS:= -std=c++2a -pthread -Wall -Wno-comment -fPIC -O2 -pipe
 #LIBS	:=

@@ -1,15 +1,13 @@
 #ifndef ASSERTION_HEADER
 #define ASSERTION_HEADER
 
-#include <iostream>
 #include <tuple>
 #include <utility>
 #include <optional>
 #include "predicate.hpp"
+#include "logger.hpp"
 
 namespace utz {
-	auto& log = std::cout;
-
 	template<typename ValueUnderTest, typename... Expected>
 	struct assertion: public std::pair<
 		predicate<ValueUnderTest, Expected...>*,
@@ -27,7 +25,6 @@ namespace utz {
 			Expected...
 		);
 	};
-
 
 	template<typename ValueUnderTest, typename... Expected>
 	assertion<ValueUnderTest, Expected...> expect(
