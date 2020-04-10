@@ -30,9 +30,9 @@ lib:
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -shared -o bin/libutz.so
 
 test:
-	echo "Testing the library..."
-	$(CXX) $(CXXFLAGS) src/test.cpp -o bin/test -lutz
-	bin/test
+	@echo "Testing the library..."
+	@$(CXX) $(CXXFLAGS) src/test.cpp -o bin/test -lutz
+	@bin/test
 
 examples:
 	echo "Compiling examples..."
