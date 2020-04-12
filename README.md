@@ -12,26 +12,32 @@ At the moment, the C++ standard is really limited so far regarding on unit testi
 * Try to reduce the ammount of macros needed to perform unit testing.
 * Generate a report for test passed, failed and/or skipped, and include the coverage.
 * Reduce the hassle of the current way to perform unit testing in C++.
+* The source code for the application under test shouldn't need any special condition.
 * Avoid abbreviations as possible in the naming.
+
+## Constrains
+The developers don't need to add or remove special tags, macros, attributes or anything else their functionallity sources.
+
+All special situations should be resolved either of the test side or with the proper flags and parameters for the compiler and/or linker.
 
 ## Purposed syntax
 Following subsections try to illustrate with some examples the initial purposed syntax \[the dream(?)\].
 
 ### Assertions
 ```C++
-#include <utz/assertion.hpp>
-using utz::expect;
-using utz::skip;
-...
-"Expecting 5 + 7 = 12."
-  | expect(sum(5, 7), is::equal, 12);
+#include <utz.hpp>
 
-"Expecting non-empty collection."
-  | expect(collection.size(), is::greater, 0);
+void test() {
+  "Expecting 5 + 7 = 12."
+    | expect(sum(5, 7), is::equal, 12);
 
-(skip)
-"Expecting country table has the key 'MX'"
-  | expect(contries, has::key, 'MX');
+  "Expecting non-empty collection."
+    | expect(collection.size(), is::greater, 0);
+
+  (skip)
+  "Expecting country table has the key 'MX'"
+    | expect(contries, has::key, 'MX');
+}
 ```
 Sample output for those assertions:
 ```
@@ -42,27 +48,29 @@ Sample output for those assertions:
 
 ### Mocking
 ```C++
+#include <format> // C++20
+#include <utz.hpp>
 #include <utz/mock.hpp>
-#include <utz/assertion.hpp>
-using utz::expect;
 using utz::when;
-...
-utz::mock mymethod(&myclass::mymethod);
-utz::mock logger(&log::error);
-int x = 10, y = 20, z = 30;
-when(mymethod, is::called_with, std::tuple(x, y))->returns(0);
-when(mymethod, is::called_with, std::tuple(z, x))->throws<std::out_of_range>();
-function_under_test(x, y, z);
 
-"Expecting mymethod was called 3 times within function_under_test."
-  | expect(mymethod.number_of_calls(), is::equal, 3);
+void test() {
+  utz::mock mymethod(&myclass::mymethod);
+  utz::mock logger(&log::error);
+  int x = 10, y = 20, z = 30;
+  when(mymethod, is::called_with, std::tuple(x, y))->returns(0);
+  when(mymethod, is::called_with, std::tuple(z, x))->throws<std::out_of_range>();
+  function_under_test(x, y, z);
 
-std::format(
-  "The second call (1-index) should be performed with '{0}' and '{1}' as arguments.", x, y
-) | expect(mymethod.arguments_for_call(2), is::equal, std::tuple(x, y));
+  "Expecting mymethod was called 3 times within function_under_test."
+    | expect(mymethod.number_of_calls(), is::equal, 3);
 
-"The thrown error/exception should be logged."
-  | expect(logger.number_of_calls(), is::equal, 1);
+  std::format(
+    "The second call (1-index) should be performed with '{0}' and '{1}' as arguments.", x, y
+  ) | expect(mymethod.arguments_for_call(2), is::equal, std::tuple(x, y));
+
+  "The thrown error/exception should be logged."
+    | expect(logger.number_of_calls(), is::equal, 1);
+}
 ```
 Sample output for that test:
 ```
@@ -73,31 +81,30 @@ Sample output for that test:
 
 ### Data Driven Test (DDT)
 ```C++
+#include <utz.hpp>
 #include <utz/data.hpp>
-#include <utz/expect.hpp>
-using utz::expect;
-...
+
 void mytest_for_integer_division(int dividend, int divisor, const utz::behaviour& expected) {
   std::format(
     "Integer division of {0} over {1} should {2}.", dividend, divisor, expected.to_string()
   ) | expect(integer_division(dividend, divisor), has::behaviour, expected);
 }
-...
-utz::suite {
-    utz::pool {
-      {60, 20, utz::returns(3)},
-      {10, 40, utz::returns(0)},
-      {-1, 40, utz::returns(0)},
-      {-6, -2, utz::returns(3)},
-      {60, -9, utz::returns(6)},
-      {-1, 40, utz::returns(0)},
-      {-9, -2, utz::returns(4)},
-      { 0, -2, utz::returns(0)},
-      {-9,  0, utz::throws<
-        std::invalid_argument>}},
-    } | mytest_for_integer_division;
 
-    utz::pool(stream_of_data_provider) | other_test;
+utz::suite {
+  utz::pool {
+    {60, 20, utz::returns(3)},
+    {10, 40, utz::returns(0)},
+    {-1, 40, utz::returns(0)},
+    {-6, -2, utz::returns(3)},
+    {60, -9, utz::returns(6)},
+    {-1, 40, utz::returns(0)},
+    {-9, -2, utz::returns(4)},
+    { 0, -2, utz::returns(0)},
+    {-9,  0, utz::throws<
+      std::invalid_argument>}},
+  } | mytest_for_integer_division;
+
+  utz::pool(stream_of_data_provider) | other_test;
 };
 ```
 That test cases should be generate something like following output:
@@ -114,3 +121,8 @@ That test cases should be generate something like following output:
 ❌ [FAILED] Integer division of -9 over  0 should throw 'std::invalid_argument'. 😢
 ...
 ```
+
+## Acknowledgements
+I would like to say thank you to people and their projects whose motivates me and help me to understand what to do and what don't in the development of this project. Following are some of them:
+* My friend, former co-worker and and former captain football team (Adrian Ortega)[https://github.com/elfus] and his thesis project (jcut)[https://github.com/elfus/jcut] which aims to provide an extension for C programming language via LLVM to implement unit testing.
+* [Daniel Hardman](https://about.me/daniel.hardman) and his post about [variadic macro tricks](https://codecraft.co/2014/11/25/variadic-macros-tricks/).
