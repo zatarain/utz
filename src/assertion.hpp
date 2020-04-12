@@ -6,6 +6,14 @@
 #include <optional>
 #include "predicate.hpp"
 #include "logger.hpp"
+#include "apply.hpp"
+
+#define __EXPECTED_TYPE__(expression) , decltype(expression)
+#define expect(value, predicate, ...) utz::assertion(\
+	&predicate<decltype(value)\
+	__APPLY_MACRO__(__EXPECTED_TYPE__, __VA_ARGS__)>,\
+	std::move(std::tuple(value, __VA_ARGS__))\
+)
 
 namespace utz {
 	template<typename ValueUnderTest, typename... Expected>
@@ -20,12 +28,14 @@ namespace utz {
 		bool operator()() const;
 	};
 
+	#ifndef expect
 	template<typename ValueUnderTest, typename... Expected>
 	assertion<ValueUnderTest, Expected...> expect(
 		ValueUnderTest,
 		predicate<ValueUnderTest, Expected...>,
 		Expected...
 	);
+	#endif
 
 	using skip = std::optional<std::string>;
 }
