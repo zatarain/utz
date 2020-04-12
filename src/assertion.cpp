@@ -17,6 +17,7 @@ bool utz::assertion<ValueUnderTest, Expected...>::operator()() const {
 	return std::apply(*(this->first), this->second);
 }
 
+#ifndef expect
 template<typename ValueUnderTest, typename... Expected>
 utz::assertion<ValueUnderTest, Expected...> utz::expect(
 	ValueUnderTest value,
@@ -26,6 +27,7 @@ utz::assertion<ValueUnderTest, Expected...> utz::expect(
 	std::tuple arguments(value, expected...);
 	return utz::assertion<ValueUnderTest, Expected...>(&test, std::move(arguments));
 }
+#endif
 
 template<typename Descriptor, typename ValueUnderTest, typename... Expected>
 void operator|(
