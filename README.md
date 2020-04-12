@@ -15,7 +15,7 @@ At the moment, the C++ standard is really limited so far regarding on unit testi
 * The source code for the application under test shouldn't need any special condition.
 * Avoid abbreviations as possible in the naming.
 
-## Constrains
+## Constraints
 The developers don't need to add or remove special tags, macros, attributes or anything else their functionallity sources.
 
 All special situations should be resolved either of the test side or with the proper flags and parameters for the compiler and/or linker.
