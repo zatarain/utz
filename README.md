@@ -3,7 +3,7 @@
 This project aims to provide a library to make unit testing in C++ based on the standard library for those passionated to the unit testing, software development and C++ standard.
 
 ## Motivation
-At the moment, the C++ standard is really limited so far regarding on unit testing, to say the less. Reviewing the state of the art, there are some libraries already like boost, GTest+GMock, FakeIt, catch, mettle, cute and many others. However, in terms of the mocking they are significant limited, for instance they can only mock virtual methods and some times a method was not designed as virtual and we are not the developer or maintainer for that method (which is likely when we try to mock something) or we even don't have access to the source code only the binaries.
+At the moment, the C++ standard is really limited so far regarding on unit testing, to say the less. Reviewing the state of the art, there are some libraries already like boost, GTest+GMock, FakeIt, catch, mettle, cute and many others. However, in terms of mocking they are significant limited. For instance, they can only mock virtual methods and sometimes a method was not designed as virtual and we are not the developer or maintainer for that method (which is likely when we try to mock something) or we even don't have access to the source code only the binaries.
 
 ## Tenets
 * Provide a readable and maintainbale way to write assertions.
@@ -16,12 +16,12 @@ At the moment, the C++ standard is really limited so far regarding on unit testi
 * Avoid abbreviations as possible in the naming.
 
 ## Constraints
-The developers don't need to add or remove special tags, macros, attributes or anything else their functionallity sources.
+The developers don't need to add or remove special tags, macros, attributes or anything else to the functionality sources.
 
 All special situations should be resolved either of the test side or with the proper flags and parameters for the compiler and/or linker.
 
 ## Purposed syntax
-Following subsections try to illustrate with some examples the initial purposed syntax \[the dream(?)\].
+Following subsections aim to illustrate with some examples the initial purposed syntax \[the dream(?)\].
 
 ### Assertions
 ```C++
@@ -123,6 +123,7 @@ That test cases should be generate something like following output:
 ```
 
 ## Acknowledgements
-I would like to say thank you to people and their projects whose motivates me and help me to understand what to do and what don't in the development of this project. Following are some of them:
+I would like to thank to people and their projects whose motivate me and helped me to understand what to do and what not to do in the development of this project. Following are some of them:
 * My friend, former co-worker and and former football team captain [Adrian Ortega](https://github.com/elfus) and his thesis project [jcut](https://github.com/elfus/jcut) which aims to provide an extension for C programming language via LLVM to implement unit testing.
+* My friend and former co-worker [Angel Noe Martinez](https://github.com/legan78) and his advises and corrections in the documentation redaction for this project.
 * [Daniel Hardman](https://about.me/daniel.hardman) and his post about [variadic macro tricks](https://codecraft.co/2014/11/25/variadic-macros-tricks/).
