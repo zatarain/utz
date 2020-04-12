@@ -18,12 +18,6 @@ namespace utz {
 			const std::tuple<ValueUnderTest, Expected...>&&
 		);
 		bool operator()() const;
-		friend assertion<ValueUnderTest, Expected...>
-		expect<ValueUnderTest, Expected...>(
-			ValueUnderTest,
-			predicate<ValueUnderTest, Expected...>,
-			Expected...
-		);
 	};
 
 	template<typename ValueUnderTest, typename... Expected>

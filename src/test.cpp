@@ -1,24 +1,16 @@
-#include "assertion.hpp"
-#include "mock.hpp"
+#include "test.hpp"
 
-namespace is = utz::is;
-using utz::expect;
-using utz::skip;
-
-int main(int argc, char const *argv[]) {
+int __wrap_main(int argc, char* argv[]) {
 	std::ios_base::sync_with_stdio(false);
 	std::cin.tie(NULL);
+	__test__();
+	return EXIT_SUCCESS;
+}
 
-	int a = 3, b = 4;
+void __test__() {
+	utz::log << "~~> Starting unit testing zeal..." << std::endl;
 
-	"a = b"
-		| expect(a, is::equal<int>, b);
+	utz::test();
 
-	"a = 3"
-		| expect(a, is::equal<int>, 3);
-
-	(skip) "b = 1"
-		| expect(b, is::equal<int>, 3);
-
-	return 0;
+	utz::log << "~~> Exiting unit testing zeal..." << std::endl;
 }

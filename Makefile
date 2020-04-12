@@ -1,24 +1,9 @@
-OBJECTS := src/logger.cpp src/predicate.cpp src/mock.cpp src/assertion.cpp
-#PROJECTS:= `find * -name "main.cpp" | sed -r 's/\/[^\/]+$$//'`
-CXXFLAGS:= -std=c++2a -pthread -Wall -Wno-comment -fPIC -O2 -pipe
-#LIBS	:=
-#-lboost_system
+OBJECTS := `find src -type f -name "*.cpp"`
+CXXFLAGS:= -std=c++17 -pthread -Wall -Wno-comment -fPIC -O2 -pipe -Wl,--wrap=main
 
-.SILENT: all clean install uninstall lib examples
+.SILENT: all clean install uninstall lib examples test
 
 all: lib examples
-#	for project in $(PROJECTS); do make ~$$project; done
-
-#obj/%.o: %.cpp
-#	@echo "Compiling dependency: '$<'..."
-#	@mkdir -p $(@D)
-#	@$(CXX) -c $(CXXFLAGS) -I. $< -o $@ $(LIBS)
-
-#~%: %
-#	@echo "Building dependencies for '$<'..."
-#	@for object in $(OBJECTS) `find $</*.cpp | sed -r 's/cpp$$/o/' | sed -r 's/^/obj\//'`; do make --silent $$object; done
-#	@echo "Construyendo ejecutable de '$<'..."
-#	@$(CXX) $(CXXFLAGS) $(OBJECTS) `find obj/$</*.o` -o bin/$< $(LIBS)
 
 clean:
 	rm -rf bin/
@@ -30,18 +15,28 @@ lib:
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -shared -o bin/libutz.so
 
 test:
-	@echo "Testing the library..."
-	@$(CXX) $(CXXFLAGS) src/test.cpp -o bin/test -lutz
-	@bin/test
+	echo "Testing the library..."
+	mkdir -p bin/test
+	$(CXX) $(CXXFLAGS) -x c++ examples/utz/main.tpp -o bin/test/main -lutz
+	bin/test/main
 
 examples:
 	echo "Compiling examples..."
 
 install:
-	cp bin/libutz.so /usr/local/lib/ || (echo "Error installing the library!" && exit 1)
+	(\
+		mkdir -p /usr/include/utz \
+		&& cp src/*.hpp $(OBJECTS) /usr/include/utz \
+		&& cp bin/libutz.so /usr/local/lib/ \
+		&& mv /usr/include/utz/utz.hpp /usr/include/utz.hpp \
+	)  || (echo "Error installing the library!" && exit 1)
 	echo "The library was successfully installed!"
 
 uninstall:
 	echo "Uninstalling the library..."
-	rm -f /usr/local/lib/libutz.so || (echo "Error removing the library!" && exit 1)
+	(\
+		rm -rf \
+			/usr/local/lib/libutz.so \
+			/usr/include/utz \
+	) || (echo "Error removing the library!" && exit 1)
 	echo "The library was successfully uninstalled!"
