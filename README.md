@@ -124,5 +124,5 @@ That test cases should be generate something like following output:
 
 ## Acknowledgements
 I would like to say thank you to people and their projects whose motivates me and help me to understand what to do and what don't in the development of this project. Following are some of them:
-* My friend, former co-worker and and former captain football team [Adrian Ortega](https://github.com/elfus) and his thesis project [jcut](https://github.com/elfus/jcut) which aims to provide an extension for C programming language via LLVM to implement unit testing.
+* My friend, former co-worker and and former football team captain [Adrian Ortega](https://github.com/elfus) and his thesis project [jcut](https://github.com/elfus/jcut) which aims to provide an extension for C programming language via LLVM to implement unit testing.
 * [Daniel Hardman](https://about.me/daniel.hardman) and his post about [variadic macro tricks](https://codecraft.co/2014/11/25/variadic-macros-tricks/).
