@@ -7,17 +7,17 @@ Following sections aim to define a design for this tool in order to be able to t
 
 ## Inputs and configuration
 The tool will need following inputs:
-* Test implementation files (*.tpp) where the function `void test();` is implemented.
+* Test implementation files (*.tpp) where the entry point function is implemented.
 * Configuration via Testfile which is described in following section.
 * The source or object files from the application under test to generate a shared library.
 
 ### Test implementation files
-Test cases will be implemented in a *.tpp files containing an implementation for the main test function:
+Test cases will be implemented in a *.tpp files containing an implementation for the main test case function:
 ```C++
 void utz::test();
 ```
 
-That function is basically the entry point for the test cases as `int main(int, const char**)` is for an executable application.
+That function is basically the entry point for the test cases as the function `int main(...)` is for an executable application.
 
 We should be able to run:
 * a single test in a tpp file
