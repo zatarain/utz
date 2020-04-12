@@ -1,6 +1,6 @@
 #include "test.hpp"
 
-int __wrap_main(int argc, char* argv[]) {
+int __wrap_main(int argc, const char* argv[]) {
 	std::ios_base::sync_with_stdio(false);
 	std::cin.tie(NULL);
 	__test__();

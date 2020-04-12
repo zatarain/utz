@@ -1,29 +1,47 @@
 OBJECTS := `find src -type f -name "*.cpp"`
-CXXFLAGS:= -std=c++17 -pthread -Wall -Wno-comment -fPIC -O2 -pipe -Wl,--wrap=main
+EXAMPLE := `find examples/src -type f -name "*.cpp"`
+TESTCASE:= `find examples/utz -type f -name "*.tpp"`
+MULTILINE:= sed -r 's/ /\n/g' | sed -r 's/^/\t/'
+CXXFLAGS:= -std=c++17 -pthread -Wall -Wno-comment -fPIC -O2 -pipe
 
-.SILENT: all clean install uninstall lib examples test
+.SILENT: all clean install uninstall lib example test-example
 
-all: lib examples
+all: lib examples test-example
 
 clean:
 	rm -rf bin/
 
 lib:
 	echo "Compiling the library..."
-	echo Files: $(OBJECTS)
+	echo "Source files:"
+	echo $(OBJECTS) | $(MULTILINE)
 	mkdir -p bin/
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -shared -o bin/libutz.so
 
-test:
-	echo "Testing the library..."
-	mkdir -p bin/test
-	$(CXX) $(CXXFLAGS) -x c++ examples/utz/main.tpp -o bin/test/main -lutz
-	bin/test/main
 
-examples:
+
+example:
 	echo "Compiling examples..."
+	echo "Example source files:"
+	echo $(EXAMPLE) | $(MULTILINE)
+	$(CXX) $(CXXFLAGS) -shared -I./examples/src $(EXAMPLE) -o bin/libexample.so
+
+test-example:
+	echo "Compiling test cases..."
+	echo "Test cases source files:"
+	#echo $(TESTCASE) | $(MULTILINE)
+	mkdir -p bin/test
+	for testcase in $(TESTCASE); do \
+		file=`basename $$testcase`;\
+		file="$${file%.*}";\
+		echo "~~> $$testcase ($$file)";\
+		$(CXX) $(CXXFLAGS) -x c++ -Wl,--wrap=main -I./examples/src $$testcase\
+			-o bin/test/$$file -L./bin/ -lutz -lexample ;\
+		LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:./bin/ bin/test/$$file; \
+	done
 
 install:
+	echo "We are about to install the library."
 	(\
 		mkdir -p /usr/include/utz \
 		&& cp src/*.hpp $(OBJECTS) /usr/include/utz \

@@ -10,7 +10,7 @@ COPY src src
 COPY examples examples
 COPY Makefile ./
 
-RUN make all && make install && make test
+RUN make lib && make example && make install && make test-example
 
 #RUN make clean && make uninstall
 

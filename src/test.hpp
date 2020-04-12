@@ -5,8 +5,8 @@
 #include "logger.hpp"
 
 extern "C" {
-	int __real_main(int, char* []);
-	int __wrap_main(int, char* []);
+	int __real_main(int, const char* []);
+	int __wrap_main(int, const char* []);
 }
 
 void __test__();

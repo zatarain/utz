@@ -7,6 +7,7 @@ int main(int argc, char const *argv[]) {
 
 	essential::helloworld();
 	essential::hi("Ulises");
-	std::cout << "Exceptional Division: 7/4" << essential::exceptional_division(7, 4) << std::endl;
+	std::cout << "Exceptional Division: 7/4" <<
+		essential::exceptional_division(7, 4) << std::endl;
 	return 0;
 }
