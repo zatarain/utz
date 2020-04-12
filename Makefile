@@ -14,28 +14,26 @@ clean:
 lib:
 	echo "Compiling the library..."
 	echo "Source files:"
-	echo $(OBJECTS) | $(MULTILINE)
+	echo ${OBJECTS} | ${MULTILINE}
 	mkdir -p bin/
-	$(CXX) $(CXXFLAGS) $(OBJECTS) -shared -o bin/libutz.so
-
-
+	${CXX} ${CXXFLAGS} ${OBJECTS} -shared -o bin/libutz.so
 
 example:
 	echo "Compiling examples..."
 	echo "Example source files:"
-	echo $(EXAMPLE) | $(MULTILINE)
-	$(CXX) $(CXXFLAGS) -shared -I./examples/src $(EXAMPLE) -o bin/libexample.so
+	echo ${EXAMPLE} | ${MULTILINE}
+	${CXX} ${CXXFLAGS} -shared -I./examples/src ${EXAMPLE} -o bin/libexample.so
 
 test-example:
 	echo "Compiling test cases..."
 	echo "Test cases source files:"
-	#echo $(TESTCASE) | $(MULTILINE)
+	#echo ${TESTCASE} | ${MULTILINE}
 	mkdir -p bin/test
-	for testcase in $(TESTCASE); do \
+	for testcase in ${TESTCASE}; do \
 		file=`basename $$testcase`;\
 		file="$${file%.*}";\
 		echo "~~> $$testcase ($$file)";\
-		$(CXX) $(CXXFLAGS) -x c++ -Wl,--wrap=main -I./examples/src $$testcase\
+		${CXX} ${CXXFLAGS} -x c++ -Wl,--wrap=main -I./examples/src $$testcase\
 			-o bin/test/$$file -L./bin/ -lutz -lexample ;\
 		LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:./bin/ bin/test/$$file; \
 	done
@@ -44,7 +42,7 @@ install:
 	echo "We are about to install the library."
 	(\
 		mkdir -p /usr/include/utz \
-		&& cp src/*.hpp $(OBJECTS) /usr/include/utz \
+		&& cp src/*.hpp ${OBJECTS} /usr/include/utz \
 		&& cp bin/libutz.so /usr/local/lib/ \
 		&& mv /usr/include/utz/utz.hpp /usr/include/utz.hpp \
 	)  || (echo "Error installing the library!" && exit 1)
