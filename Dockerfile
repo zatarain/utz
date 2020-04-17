@@ -5,12 +5,11 @@ ENV DEBIAN_FRONTEND=noninteractive \
 	PATH=${PATH}:/build/bin
 RUN echo "${TERM}" && tabs -4
 
+COPY . /build
 WORKDIR /build
-COPY src src
-COPY examples examples
-COPY Makefile ./
 
-RUN make lib && make example && make install && make test-example
+RUN make lib && make install
+RUN make test-example
 
 #RUN make clean && make uninstall
 
