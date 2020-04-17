@@ -12,7 +12,7 @@ application-under-test:
 	echo "Example source files:"
 	echo ${SOURCES} | ${MULTILINE}
 	mkdir -p bin/
-	${CXX} ${CXXFLAGS} -Isrc ${SOURCES} -o bin/libaut.so
+	${CXX} ${CXXFLAGS} -shared -Isrc ${SOURCES} -o bin/libaut.so
 	echo "Surccessfully compiled application under test library!"
 
 test:
@@ -20,13 +20,11 @@ test:
 	echo "Test cases source files:"
 	echo ${TESTCASES} | ${MULTILINE}
 	mkdir -p bin/test/
-	LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:`pwd`/bin/
 	for testcase in ${TESTCASES}; do \
 		file=`basename $$testcase`;\
 		file="$${file%.*}";\
 		echo "~~> $$testcase ($$file)";\
-		echo "${CXX} ${CXXFLAGS} -x c++ -Wl,--wrap=main -Isrc $$testcase -o bin/test/$$file -Lbin -lutz -laut" ;\
 		${CXX} ${CXXFLAGS} -x c++ -Wl,--wrap=main -Isrc $$testcase\
 			-o bin/test/$$file -Lbin -lutz -laut ;\
-		bin/test/$$file; \
+		LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:bin/ bin/test/$$file; \
 	done

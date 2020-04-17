@@ -5,7 +5,9 @@
 #include "utz/test.hpp"
 
 namespace is = utz::is;
+#ifndef expect
 using utz::expect;
+#endif
 using utz::skip;
 
 #endif
