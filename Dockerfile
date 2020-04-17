@@ -1,4 +1,4 @@
-FROM gcc:9.3.0
+FROM zatarain/gcc:development
 ENV DEBIAN_FRONTEND=noninteractive \
 	LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH} \
 	TERM=xterm \
@@ -7,7 +7,6 @@ RUN echo "${TERM}" && tabs -4
 
 COPY . /build
 WORKDIR /build
-
 RUN make lib && make install
 RUN make test-example
 

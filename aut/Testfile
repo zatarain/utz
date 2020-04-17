@@ -2,29 +2,44 @@ SOURCES := `find src/ -type f -name "*.cpp"`
 TESTCASES:= `find utz/ -type f -name "*.tpp"`
 MULTILINE:= sed -r 's/ /\n/g' | sed -r 's/^/\t/'
 CXXFLAGS:= -std=c++17 -Wall -Wno-comment -fPIC -O2 -pipe
+COVDIR:= bin/test/coverage
+
+USE_GENPNG := $(shell genpng --help >/dev/null 2>/dev/null; echo $$?)
+
+ifeq ($(USE_GENPNG),0)
+  FRAMES := --frames
+else
+  FRAMES :=
+endif
 
 .SILENT: all application-under-test test
 
 all: test
 
-application-under-test:
+application:
 	echo "Compiling application-under-test..."
 	echo "Example source files:"
 	echo ${SOURCES} | ${MULTILINE}
 	mkdir -p bin/
-	${CXX} ${CXXFLAGS} -shared -Isrc ${SOURCES} -o bin/libaut.so
+	${CXX} ${CXXFLAGS} -shared -fprofile-arcs -ftest-coverage -Isrc ${SOURCES} -o bin/libaut.so
 	echo "Surccessfully compiled application under test library!"
 
-test:
+test: application
 	echo "Compiling test cases..."
 	echo "Test cases source files:"
 	echo ${TESTCASES} | ${MULTILINE}
-	mkdir -p bin/test/
+	mkdir -p ${COVDIR}
 	for testcase in ${TESTCASES}; do \
 		file=`basename $$testcase`;\
 		file="$${file%.*}";\
-		echo "~~> $$testcase ($$file)";\
+		echo "~~> $$testcase:";\
 		${CXX} ${CXXFLAGS} -x c++ -Wl,--wrap=main -Isrc $$testcase\
-			-o bin/test/$$file -Lbin -lutz -laut ;\
+			-o bin/test/$$file -Lbin -lutz -laut -lgcov ;\
+		lcov --zerocounters --directory .; \
 		LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:bin/ bin/test/$$file; \
+		lcov --capture --directory . --output-file $$file.info \
+			--test-name $$file --no-external;\
 	done
+	genhtml *.info --output-directory ${COVDIR}\
+	   --title "Test coverage for Application Under Test" \
+	   --show-details $(FRAMES) --legend

@@ -4,7 +4,7 @@ CXXFLAGS:= -std=c++17 -Wall -Wno-comment -fPIC -O2 -pipe
 
 .SILENT: all clean install uninstall lib example test-example
 
-all: lib example test-example
+all: lib test-example
 
 clean:
 	rm -rf bin/
@@ -16,12 +16,8 @@ lib:
 	mkdir -p bin/
 	${CXX} ${CXXFLAGS} ${SOURCES} -shared -o bin/libutz.so
 
-example:
-	#make --directory=application-under-test/ application
-	make --directory=application-under-test/ --file=Testfile application-under-test
-
-test-example: example
-	make --directory=application-under-test/ --file=Testfile test
+test-example:
+	make --directory=aut/ --file=Testfile test
 
 install:
 	echo "We are about to install the library."

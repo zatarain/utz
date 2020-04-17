@@ -1,5 +1,6 @@
 #include <utz.hpp>
 #include <main.hpp>
+#include <cstdlib>
 
 void utz::test() {
 	utz::log << "Starting main test cases..." << std::endl;
@@ -7,8 +8,8 @@ void utz::test() {
 	int result = __real_main(2, arguments);
 	int a = 3, b = 4;
 
-	"main call success (result == 0)"
-		| expect(result, is::equal, 0);
+	"main call success (result == EXIT_SUCCESS)"
+		| expect(result, is::equal, EXIT_SUCCESS);
 
 	"a = b"
 		| expect(a, is::equal, b);
