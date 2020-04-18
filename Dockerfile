@@ -7,7 +7,7 @@ RUN echo "${TERM}" && tabs -4
 
 COPY . /build
 WORKDIR /build
-RUN make lib && make install
+#RUN make make install
 RUN make test-example
 
 #RUN make clean && make uninstall
