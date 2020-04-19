@@ -5,12 +5,13 @@ ENV DEBIAN_FRONTEND=noninteractive \
 	PATH=${PATH}:/build/bin
 RUN echo "${TERM}" && tabs -4
 
-COPY . /build
-WORKDIR /build
-#RUN make make install
-RUN make test-example
+WORKDIR /root
+COPY . .
+RUN make install
+WORKDIR /root/aut
+RUN utz run test=main
 
 #RUN make clean && make uninstall
 
-WORKDIR /
-ENTRYPOINT /bin/sh
+#WORKDIR /
+ENTRYPOINT /bin/bash

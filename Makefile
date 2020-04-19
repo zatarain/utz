@@ -1,45 +1,46 @@
-SOURCEDIR:= src
-TARGETDIR:= bin
-SOURCES  := $(shell find ${SOURCEDIR}/ -type f -name "*.cpp")
-OBJECTS  := $(shell echo ${SOURCES} | sed --expression='s/.cpp/.o/g; s/${SOURCEDIR}\//${TARGETDIR}\//g')
-CXXFLAGS := -std=c++17 -Wall -Wno-comment -fPIC -O2 -pipe -I${SOURCEDIR}/
-LXXFLAGS := -shared
-LIBNAME  := utz
+# Recomended variables/macros for installation
+DESTDIR    ?=
+PREFIX     ?= /usr/local
+BINDIR     ?= ${DESTDIR}${PREFIX}/bin
+LIBDIR     ?= ${DESTDIR}${PREFIX}/lib
+INCLUDEDIR ?= ${DESTDIR}${PREFIX}/include
+DATADIR    ?= ${DESTDIR}${PREFIX}/share
+MANDIR     ?= ${DATADIR}/man
+SRCDIR     := src
 
-.PHONY: all clean install uninstall test-example
-.SILENT: all clean install uninstall test-example
+# Macro/variables specific for the library
+BUILD      := out
+SOURCES    := $(shell find ${SRCDIR}/ -type f -name "*.cpp")
+OBJECTS    := $(patsubst ${SRCDIR}%,${BUILD}%,${SOURCES:.cpp=.o})
+CXXFLAGS   := -std=c++17 -Wall -Wno-comment -fPIC -O2 -pipe -I${SRCDIR}/
+LXXFLAGS   := -shared
+LIBNAME    := utz
+
+.PHONY: all clean install uninstall
+.SILENT: all clean install uninstall
 
 all: ${LIBNAME}
 
-${TARGETDIR}:
-	mkdir -p $@
+%/: ; @mkdir -p ${BUILD}/${*D}
 
-${TARGETDIR}/%.o: ${SOURCEDIR}/%.cpp | ${TARGETDIR}
-	@mkdir -p `dirname $@`
+${BUILD}/%.o: ${SRCDIR}/%.cpp | %/
 	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 ${LIBNAME}: ${OBJECTS}
-	${CXX} ${CXXFLAGS} ${LXXFLAGS} $^ -o ${TARGETDIR}/lib${LIBNAME}.so
-
-test-example: install
-	make --directory=aut/ --file=Testfile test
+	${CXX} ${CXXFLAGS} ${LXXFLAGS} $^ -o ${BUILD}/lib${LIBNAME}.so
 
 install: ${LIBNAME}
 	echo "We are about to install the library."
-	(\
-		cp -r ${SOURCEDIR}/${LIBNAME}.hpp ${SOURCEDIR}/${LIBNAME} /usr/include/ \
-		&& cp ${TARGETDIR}/lib${LIBNAME}.so /usr/local/lib/ \
-	)  || (echo "Error installing the library!" && exit 1)
+	cp -r ${SRCDIR}/${LIBNAME}.hpp ${SRCDIR}/${LIBNAME} ${INCLUDEDIR}/
+	cp ${BUILD}/lib${LIBNAME}.so ${LIBDIR}/
+	cp ${SRCDIR}/${LIBNAME}.sh ${BINDIR}/${LIBNAME}
+	chmod +x ${BINDIR}/${LIBNAME}
 	echo "The library was successfully installed!"
 
 clean:
-	rm -rf ${TARGETDIR}/
+	rm -rf ${BUILD}/
 
 uninstall:
 	echo "Uninstalling the library..."
-	(\
-		rm -rf \
-			/usr/local/lib/lib${LIBNAME}.so \
-			/usr/include/${LIBNAME}* \
-	) || (echo "Error removing the library!" && exit 1)
+	rm -rf ${LIBDIR}/lib${LIBNAME}.so ${INCLUDEDIR}/${LIBNAME}*
 	echo "The library was successfully uninstalled!"

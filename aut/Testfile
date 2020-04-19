@@ -1,45 +1,49 @@
-SOURCES := `find src/ -type f -name "*.cpp"`
-TESTCASES:= `find utz/ -type f -name "*.tpp"`
-MULTILINE:= sed -r 's/ /\n/g' | sed -r 's/^/\t/'
-CXXFLAGS:= -std=c++17 -Wall -Wno-comment -fPIC -O2 -pipe
-COVDIR:= bin/test/coverage
+# Recomended variables/macros for installation
+DESTDIR    ?=
+PREFIX     ?= /usr/local
+BINDIR     ?= ${DESTDIR}${PREFIX}/bin
+LIBDIR     ?= ${DESTDIR}${PREFIX}/lib
+INCLUDEDIR ?= ${DESTDIR}${PREFIX}/include
+DATADIR    ?= ${DESTDIR}${PREFIX}/share
+MANDIR     ?= ${DATADIR}/man
+SRCDIR     := src
 
-USE_GENPNG := $(shell genpng --help >/dev/null 2>/dev/null; echo $$?)
+# Macro/variables specific for the tests
+BUILD      := out
+TESTDIR    := utz
+SOURCES    := $(shell find ${SRCDIR}/ -type f -name "*.cpp")
+OBJECTS    := $(patsubst ${SRCDIR}%,${BUILD}%,${SOURCES:.cpp=.o})
+TESTCASES  := $(shell find ${TESTDIR}/ -type f -name "*.tpp")
+CXXFLAGS   := -std=c++17 -Wall -Wno-comment -fPIC -O2 -pipe -I${SRCDIR}/
+TXXFLAGS   := ${CXXFLAGS} -I${TESTDIR}/ -x c++ -Wl,--wrap=main
+TXXLIBS    := -lutz -lgcov -laut
+COVFLAGS   := -fprofile-arcs -ftest-coverage
+LXXFLAGS   := ${COVFLAGS} -shared
+COVERAGE   := coverage
 
-ifeq ($(USE_GENPNG),0)
-  FRAMES := --frames
-else
-  FRAMES :=
-endif
+.PHONY: all aut run
+.SILENT: all aut
 
-.SILENT: all application-under-test test
+all:
 
-all: test
+%/: ; @mkdir -p ${BUILD}/${*D}
 
-application:
-	echo "Compiling application-under-test..."
-	echo "Example source files:"
-	echo ${SOURCES} | ${MULTILINE}
-	mkdir -p bin/
-	${CXX} ${CXXFLAGS} -shared -fprofile-arcs -ftest-coverage -Isrc ${SOURCES} -o bin/libaut.so
+${BUILD}/%.o: ${SRCDIR}/%.cpp | %/
+	${CXX} ${CXXFLAGS} ${COVFLAGS} -c -o $@ $<
+
+aut: ${OBJECTS}
+	echo "Compiling application under test..."
+	${CXX} ${CXXFLAGS} ${LXXFLAGS} ${OBJECTS} -o ${BUILD}/lib$@.so
 	echo "Surccessfully compiled application under test library!"
 
-test: application
-	echo "Compiling test cases..."
-	echo "Test cases source files:"
-	echo ${TESTCASES} | ${MULTILINE}
-	mkdir -p ${COVDIR}
-	for testcase in ${TESTCASES}; do \
-		file=`basename $$testcase`;\
-		file="$${file%.*}";\
-		echo "~~> $$testcase:";\
-		${CXX} ${CXXFLAGS} -x c++ -Wl,--wrap=main -Isrc $$testcase\
-			-o bin/test/$$file -Lbin -lutz -laut -lgcov ;\
-		lcov --zerocounters --directory .; \
-		LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:bin/ bin/test/$$file; \
-		lcov --capture --directory . --output-file $$file.info \
-			--test-name $$file --no-external;\
-	done
-	genhtml *.info --output-directory ${COVDIR}\
-	   --title "Test coverage for Application Under Test" \
-	   --show-details $(FRAMES) --legend
+${BUILD}/%.test: ${TESTDIR}/%.tpp | %/ aut
+	${CXX} ${TXXFLAGS} $< -o $@ -L${BUILD}/ ${TXXLIBS}
+
+run: ${BUILD}/$(test).test ${COVERAGE}/
+	echo "Testing ${test}..."
+	lcov --zerocounters --directory .
+	LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:`pwd`/${BUILD}/ $<
+	lcov --capture --directory . --output-file ${test}.info --test-name ${test} --no-external
+	genhtml *.info --output-directory ${BUILD}/${COVERAGE} \
+			--title "Test coverage for Application Under Test" \
+			--show-details --legend
