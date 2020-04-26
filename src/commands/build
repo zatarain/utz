@@ -31,4 +31,4 @@ debug "Compiling '$test_cases/$testcase.tpp' to '$output/$testcase.test'"
 $compiler $test_flags "$test_cases/$testcase.tpp" \
 	-o "$output/$testcase.test" \
 	-L$output/ -l$test_library -lutz
-debug "Compilation of '$output/$testcase.test' complete!"
+success "Compilation of '$output/$testcase.test' complete!"

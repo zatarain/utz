@@ -43,3 +43,4 @@ for testcase in $testcases; do
 done
 llvm-profdata merge -sparse $coverage/*.profraw -o $coverage/code.profdata
 llvm-cov report $output/lib$test_library.so -instr-profile=$coverage/code.profdata -use-color
+success "Test complete!"

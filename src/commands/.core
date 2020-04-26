@@ -9,7 +9,11 @@ log(){
 	shift
 	colour="$1"
 	shift
-	>&2 printf '%b' "$colour[$tag]: $* \033[0m\n"
+	tab=7
+	length=$(((tab-${#tag})/2))
+	[ $length -lt 0 ] && length=0
+	tab=$((${#tag}+length))
+	>&2 printf "%b[%${length}s%-${tab}s] %s | %s \033[0m\n" "$colour" "" "$tag" "$(date)" "$*"
 }
 
 error(){
@@ -25,7 +29,7 @@ warning(){
 }
 
 info(){
-	log info "\033[34;1m" "$@"
+	log infor "\033[34;1m" "$@"
 }
 
 debug(){
