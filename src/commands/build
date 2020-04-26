@@ -1,0 +1,34 @@
+#!/bin/sh
+: "
+Name:
+	utz-build
+
+Description:
+	[This is the command description.]
+
+Syntax:
+	utz build test
+
+Parameters:
+	test	Required	Test cases to run.
+
+Examples:
+	# Compiling my-testcase.tpp in utz dir
+		utz build my-testcase
+
+: "
+
+. $utzdir/.core
+
+testcase="$1"
+info "Building application under test..."
+$aut_build
+
+info "Building test case '$test_cases/$testcase.tpp'"
+debug "Creating directory '$output'"
+mkdir -p $output
+debug "Compiling '$test_cases/$testcase.tpp' to '$output/$testcase.test'"
+$compiler $test_flags "$test_cases/$testcase.tpp" \
+	-o "$output/$testcase.test" \
+	-L$output/ -l$test_library -lutz
+debug "Compilation of '$output/$testcase.test' complete!"

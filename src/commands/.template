@@ -1,0 +1,30 @@
+#!/bin/sh
+: "
+Name:
+	utz-#name
+
+Description:
+	[This is the command description.]
+
+Syntax:
+	utz #name <param1> [param2]
+
+Parameters:
+	param1	Required	[This is param1 description.]
+
+	param2	Optional	[This is param2 description.]
+
+Examples:
+	# [This is example 1]
+		utz #name value2
+
+	# [This is example 2]
+		utz #name value1 value2
+
+: "
+
+. $utzdir/.core
+
+warning	"[TO-DO: Implementation for command #name]"
+
+success	"[Command #name was executed sucessfully.]"

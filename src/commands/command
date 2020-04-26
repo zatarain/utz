@@ -1,0 +1,45 @@
+#!/bin/sh
+: "
+Name:
+	utz-command
+
+Description:
+	Creates a new UTZ command. Super user privileges may be required.
+
+Syntax:
+	utz command <name>
+
+Parameters:
+	name	Required	Name of the new command.
+
+Examples:
+	# Creating a new command for UTZ called my-new-feature.
+		utz command my-new-feature
+
+	# After created, we will be able to run the new command.
+		utz my-new-feature ...
+
+: "
+
+. $utzdir/.core
+
+if [ $# -eq 0 ]; then
+	error	"Name for the new command is required."
+	syntax
+	exit 1
+fi
+debug	"Creating from template."
+sed -r s/#name/$1/g $utzdir/.template > "$utzdir/$1"
+
+debug	"Assigning execution permissions."
+chmod +x "$utzdir/$1"
+
+info	"Testing first call for '$utz $1'."
+"$utz" "$1"
+
+info	"Testing documentation for '$utz $1'."
+$utz help "$1"
+
+info	"Please provide an implementation in $utzdir/$1"
+warning	"Don't forget add a summary for '$1' in $utzdir/help"
+success	"Command '$1' was created successfully."

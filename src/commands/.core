@@ -1,0 +1,42 @@
+#!/bin/sh
+
+: "
+Unit Test Zeal [UTZ] core functions.
+: "
+
+log(){
+	tag=$(echo "$1" | tr "[:lower:]" "[:upper:]")
+	shift
+	colour="$1"
+	shift
+	>&2 printf '%b' "$colour[$tag]: $* \033[0m\n"
+}
+
+error(){
+	log error "\033[31;1m" "$@"
+}
+
+success(){
+	log success "\033[32;1m" "$@"
+}
+
+warning(){
+	log warning "\033[33;1m" "$@"
+}
+
+info(){
+	log info "\033[34;1m" "$@"
+}
+
+debug(){
+	log debug "\033[39;1m" "$@"
+}
+
+syntax(){
+	>&2 grep --after=1 Syntax: "$0" | head -2
+}
+
+parse(){
+	export Testfile="$(sed -Ef "$utzdir/parser.rx" "$1")"
+	eval "$(echo "$Testfile" | sed -Ee 's/.+/export \0;/')"
+}

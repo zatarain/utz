@@ -1,0 +1,45 @@
+#!/bin/sh
+: "
+Name:
+	utz-test
+
+Description:
+	Runs test cases.
+
+Syntax:
+	utz test [testcase...]
+
+Parameters:
+	testcase	Optional	Name of test cases to run. If it's not present all
+							test cases will run.
+
+Examples:
+	# Running all test cases (*.tpp) in test folder
+		utz test
+
+	# Running a single test case values.tpp
+		utz test values
+
+	# Running test case keys.tpp values.tpp
+		utz test keys values
+: "
+
+. $utzdir/.core
+
+testcases="$@"
+if [ -z "$testcases" ]; then
+	testcases=$(find $test_cases/ -type f -name "*.tpp")
+fi
+debug "Test cases to run: $testcases"
+profile="$coverage/code-%p.profraw"
+for testcase in $testcases; do
+	testcase=${testcase%.*}
+	testcase=${testcase#*/}
+	utz build $testcase
+	info "Testing ${testcase}..."
+	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$output/ \
+	LLVM_PROFILE_FILE="$profile" $output/$testcase.test
+	debug "Colecting coverage date for '$output/$testcase.test'"
+done
+llvm-profdata merge -sparse $coverage/*.profraw -o $coverage/code.profdata
+llvm-cov report $output/lib$test_library.so -instr-profile=$coverage/code.profdata -use-color

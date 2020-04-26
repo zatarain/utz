@@ -1,0 +1,31 @@
+#!/bin/sh
+
+: "
+Name
+	Unit Test Zeal [UTZ]
+
+Description:
+	Unit testing for C++ projects.
+
+Syntax:
+	utz command [parameters]
+
+Commands:
+	build		Builds test cases in the current project.
+	test		Runs test cases, it builds the test cases before if necessary.
+	command		Creates a new utz command.
+	help		Shows this message or provide detailed help for an specific command.
+
+For further information run:
+	utz help <command>
+
+: "
+
+. $utzdir/.core
+
+command=$utzdir/$1
+if [ $# -eq 0 ] || [ ! -x "$command" ] || echo "$command" | grep -Eq '/\.[^/]+$' ; then
+	command=$0
+fi
+
+sed -n '/^: "$/,/^: "$/p' $command | sed -r '1,1d;$d;s/\\(.)/\1/g'
