@@ -1,14 +1,33 @@
-SOURCES := `find src/ -type f -name "*.cpp"`
-MULTILINE:= sed -r 's/ /\n/g' | sed -r 's/^/\t/'
-CXXFLAGS:= -std=c++17 -Wall -Wno-comment -fPIC -O2 -pipe
+SRCDIR   := src
+SOURCES  := `find src/ -type f -name "*.cpp"`
+CXX		 := clang++ -std=c++17 -stdlib=libc++
+CXXFLAGS := -Wall -Wno-comment -fPIC -pipe -I${SRCDIR}/
+BUILD    := out
+COVFLAGS := -fcoverage-mapping -fprofile-instr-generate -g -O0
+LXXFLAGS := ${COVFLAGS} -shared
 
-.SILENT: all application
+.SILENT: all application ${BUILD}/libaut.so
 
-all: application
+all: application ${BUILD}/libaut.so
 
 application:
-	echo "Compiling application-under-test..."
+	echo "Compiling example application..."
 	echo "Source files:"
-	echo ${SOURCES} | ${MULTILINE}
-	mkdir -p bin
-	${CXX} ${CXXFLAGS} -Isrc/ ${SOURCES} -o bin/application
+	echo -e ${SOURCES}
+	mkdir -p ${BUILD}
+	${CXX} ${CXXFLAGS} ${SOURCES} -o ${BUILD}/application
+	echo "The application was surccessfully compiled!"
+
+${BUILD}/libaut.so:
+	echo "Compiling application under test..."
+	for source in ${SOURCES}; do\
+		object=${BUILD}/$${source#*/};\
+		object=$${object%.*}.o;\
+		output=$${object%/*};\
+		mkdir -p $$output;\
+		echo ${CXX} ${CXXFLAGS} ${COVFLAGS} -c $$source -o $$object;\
+		${CXX} ${CXXFLAGS} ${COVFLAGS} -c $$source -o $$object;\
+		objects="$$objects $$object";\
+	done; ${CXX} ${LXXFLAGS} $$objects -o ${BUILD}/libaut.so
+	echo "Surccessfully compiled application under test library!"
+

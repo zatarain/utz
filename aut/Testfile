@@ -1,49 +1,11 @@
-# Recomended variables/macros for installation
-DESTDIR    ?=
-PREFIX     ?= /usr/local
-BINDIR     ?= ${DESTDIR}${PREFIX}/bin
-LIBDIR     ?= ${DESTDIR}${PREFIX}/lib
-INCLUDEDIR ?= ${DESTDIR}${PREFIX}/include
-DATADIR    ?= ${DESTDIR}${PREFIX}/share
-MANDIR     ?= ${DATADIR}/man
-SRCDIR     := src
-
-# Macro/variables specific for the tests
-BUILD      := out
-TESTDIR    := utz
-SOURCES    := $(shell find ${SRCDIR}/ -type f -name "*.cpp")
-OBJECTS    := $(patsubst ${SRCDIR}%,${BUILD}%,${SOURCES:.cpp=.o})
-TESTCASES  := $(shell find ${TESTDIR}/ -type f -name "*.tpp")
-CXXFLAGS   := -std=c++17 -Wall -Wno-comment -fPIC -O2 -pipe -I${SRCDIR}/
-TXXFLAGS   := ${CXXFLAGS} -I${TESTDIR}/ -x c++ -Wl,--wrap=main
-TXXLIBS    := -lutz -lgcov -laut
-COVFLAGS   := -fprofile-arcs -ftest-coverage
-LXXFLAGS   := ${COVFLAGS} -shared
-COVERAGE   := coverage
-
-.PHONY: all aut run
-.SILENT: all aut
-
-all:
-
-%/: ; @mkdir -p ${BUILD}/${*D}
-
-${BUILD}/%.o: ${SRCDIR}/%.cpp | %/
-	${CXX} ${CXXFLAGS} ${COVFLAGS} -c -o $@ $<
-
-aut: ${OBJECTS}
-	echo "Compiling application under test..."
-	${CXX} ${CXXFLAGS} ${LXXFLAGS} ${OBJECTS} -o ${BUILD}/lib$@.so
-	echo "Surccessfully compiled application under test library!"
-
-${BUILD}/%.test: ${TESTDIR}/%.tpp | %/ aut
-	${CXX} ${TXXFLAGS} $< -o $@ -L${BUILD}/ ${TXXLIBS}
-
-run: ${BUILD}/$(test).test ${COVERAGE}/
-	echo "Testing ${test}..."
-	lcov --zerocounters --directory .
-	LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:`pwd`/${BUILD}/ $<
-	lcov --capture --directory . --output-file ${test}.info --test-name ${test} --no-external
-	genhtml *.info --output-directory ${BUILD}/${COVERAGE} \
-			--title "Test coverage for Application Under Test" \
-			--show-details --legend
+sources: 		src
+output: 		out
+test-cases: 	utz
+compiler: 		clang++ -std=c++17 -stdlib=libc++
+compiler-flags: -Wall -Wno-comment -fPIC -pipe -I*sources/
+coverage-flags: -fcoverage-mapping -g -O0
+coverage: 		*output/coverage
+linker-flags: 	*coverage-flags -shared -fprofile-instr-generate
+test-flags: 	*compiler-flags -I*test-cases/ -x c++ -Wl,--wrap=main
+test-library:   aut
+aut-build: 		make *output/lib*test-library.so
