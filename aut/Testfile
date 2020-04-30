@@ -8,4 +8,4 @@ coverage: 		*output/coverage
 linker-flags: 	*coverage-flags -shared -fprofile-instr-generate
 test-flags: 	*compiler-flags -I*test-cases/ -x c++ -Wl,--wrap=main
 test-library:   aut
-aut-build: 		fmake *output/lib*test-library.so
+aut-build: 		make *output/lib*test-library.so

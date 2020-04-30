@@ -12,8 +12,6 @@ CXX	   = clang++ -std=c++17 -stdlib=libc++
 
 # Macro/variables specific for the library
 BUILD      = out
-#SOURCES   = $(shell find ${SRCDIR}/ -type f -name "*.cpp")
-#OBJECTS   = $(patsubst ${SRCDIR}%,${BUILD}%,${SOURCES:.cpp=.o})
 CXXFLAGS   = -Wall -Wno-comment -fPIC -O2 -pipe -I${SRCDIR}/
 LXXFLAGS   = -shared
 LIBNAME    = utz
@@ -21,18 +19,19 @@ LIBNAME    = utz
 .SILENT: all clean install uninstall
 
 .DEFAULT:
+	@echo "Defaulting $@..."
 	@chmod +x Default.mk
 	@./Default.mk "$@"
 
 ${BUILD}/lib${LIBNAME}.so: ${OBJECTS}
 	@if [ -z "${OBJECTS}" ]; then \
-		make :config:$@;\
+		make config/$@;\
 	else \
-		echo "${CXX} ${CXXFLAGS} ${LXXFLAGS} $? -o $@";\
-		${CXX} ${CXXFLAGS} ${LXXFLAGS} $? -o $@;\
+		echo "${CXX} ${CXXFLAGS} ${LXXFLAGS} ${OBJECTS} -o $@";\
+		${CXX} ${CXXFLAGS} ${LXXFLAGS} ${OBJECTS} -o $@;\
 	fi
 
-install: ${LIBNAME}
+install: ${BUILD}/lib${LIBNAME}.so
 	echo "We are about to install the library."
 	cp -r ${SRCDIR}/${LIBNAME}.hpp ${SRCDIR}/${LIBNAME} ${INCLUDEDIR}/
 	cp ${BUILD}/lib${LIBNAME}.so ${LIBDIR}/
