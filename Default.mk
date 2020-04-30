@@ -1,10 +1,9 @@
 #!/bin/sh
 
 if [ $# -eq 0 ]; then exit 1; fi
-target="$1"
 
+# Directories for source code and output for the build.
 SOURCE=src
-CXX="clang++ -std=c++17 -stdlib=libc++"
 OUTPUT=out
 
 get_object(){
@@ -15,14 +14,18 @@ get_source(){
 	echo "$*" | sed -Ee "s#$OUTPUT/(.+).o#$SOURCE/\1.cpp#g"
 }
 
-# Variables specific for the library
+# Source files, objects and compiler flags
 SOURCES=$(find $SOURCE/ -type f -name '*.cpp')
 OBJECTS=$(get_object "$SOURCES")
+CXX="clang++ -std=c++17 -stdlib=libc++"
 CXXFLAGS="-Wall -Wno-comment -fPIC -O2 -pipe -I${SOURCE}/"
 
-case $target in
-:config:*)
-	make OBJECTS="$OBJECTS" ${target#:config:}
+target="$1"
+case "$target" in
+config/*)
+	echo "Making configuration..."
+	echo $OBJECTS
+	make OBJECTS="`echo $OBJECTS`" ${target#config/}
 ;;
 out/*.o)
 	make ${target%/*.o}/
@@ -34,5 +37,5 @@ out/*.o)
 out/*/)
 	mkdir -p $target
 ;;
+*) exit 1 ;;
 esac
-
