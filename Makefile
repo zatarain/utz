@@ -45,5 +45,6 @@ clean:
 
 uninstall:
 	echo "Uninstalling the library..."
-	rm -rf ${LIBDIR}/lib${LIBNAME}.so ${INCLUDEDIR}/${LIBNAME}*
+	rm -rfv ${LIBDIR}/lib${LIBNAME}.so ${INCLUDEDIR}/${LIBNAME}* \
+			${BINDIR}/${LIBNAME} ${BINDIR}/.${LIBNAME}/
 	echo "The library was successfully uninstalled!"
