@@ -33,10 +33,10 @@ ${BUILD}/lib${LIBNAME}.so: ${OBJECTS}
 
 install: ${BUILD}/lib${LIBNAME}.so
 	echo "We are about to install the library."
-	cp -r ${SRCDIR}/${LIBNAME}.hpp ${SRCDIR}/${LIBNAME} ${INCLUDEDIR}/
-	cp ${BUILD}/lib${LIBNAME}.so ${LIBDIR}/
-	cp ${SRCDIR}/${LIBNAME}.sh ${BINDIR}/${LIBNAME}
-	cp -r ${SRCDIR}/commands/ ${BINDIR}/.${LIBNAME}/
+	cp -rv ${SRCDIR}/${LIBNAME}.hpp ${SRCDIR}/${LIBNAME} ${INCLUDEDIR}/
+	cp -v ${BUILD}/lib${LIBNAME}.so ${LIBDIR}/
+	cp -v ${SRCDIR}/${LIBNAME}.sh ${BINDIR}/${LIBNAME}
+	cp -rv ${SRCDIR}/commands/ ${BINDIR}/.${LIBNAME}/
 	chmod +x ${BINDIR}/${LIBNAME} ${BINDIR}/.${LIBNAME}/*
 	echo "The library was successfully installed!"
 
