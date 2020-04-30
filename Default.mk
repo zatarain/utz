@@ -22,10 +22,10 @@ CXXFLAGS="-Wall -Wno-comment -fPIC -O2 -pipe -I${SOURCE}/"
 
 target="$1"
 case "$target" in
-config/*)
+.configuration:*)
 	echo "Making configuration..."
 	echo $OBJECTS
-	make OBJECTS="`echo $OBJECTS`" ${target#config/}
+	make OBJECTS="`echo $OBJECTS`" ${target#.configuration:}
 ;;
 out/*.o)
 	make ${target%/*.o}/

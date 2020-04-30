@@ -9,8 +9,7 @@ COPY . .
 RUN make install
 WORKDIR /root/aut
 RUN utz test
-
-#RUN make clean && make uninstall
-
-#WORKDIR /
+WORKDIR /root
+RUN make clean && make uninstall
+WORKDIR /
 ENTRYPOINT /bin/bash

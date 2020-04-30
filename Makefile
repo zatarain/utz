@@ -16,7 +16,7 @@ CXXFLAGS   = -Wall -Wno-comment -fPIC -O2 -pipe -I${SRCDIR}/
 LXXFLAGS   = -shared
 LIBNAME    = utz
 
-.SILENT: all clean install uninstall
+.SILENT: clean install uninstall
 
 .DEFAULT:
 	@echo "Defaulting $@..."
@@ -25,7 +25,7 @@ LIBNAME    = utz
 
 ${BUILD}/lib${LIBNAME}.so: ${OBJECTS}
 	@if [ -z "${OBJECTS}" ]; then \
-		make config/$@;\
+		make .configuration:$@;\
 	else \
 		echo "${CXX} ${CXXFLAGS} ${LXXFLAGS} ${OBJECTS} -o $@";\
 		${CXX} ${CXXFLAGS} ${LXXFLAGS} ${OBJECTS} -o $@;\
