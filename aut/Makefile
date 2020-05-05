@@ -8,7 +8,7 @@ LXXFLAGS = ${COVFLAGS} -shared
 
 .SILENT: all application ${BUILD}/libaut.so
 
-all: application ${BUILD}/libaut.so
+all: ${BUILD}/application ${BUILD}/libaut.so
 
 ${BUILD}/application:
 	echo "Compiling example application..."

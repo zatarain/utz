@@ -1,7 +1,7 @@
 .POSIX:
 # Recomended variables/macros for installation
 DESTDIR    =
-PREFIX     = /usr/local
+PREFIX     = /usr
 BINDIR     = ${DESTDIR}${PREFIX}/bin
 LIBDIR     = ${DESTDIR}${PREFIX}/lib
 INCLUDEDIR = ${DESTDIR}${PREFIX}/include
