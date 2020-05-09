@@ -1,0 +1,14 @@
+#!/bin/sh
+name=utz
+base=12.1-RELEASE
+if iocage list -h | grep -q $name; then
+	iocage destroy -f $name
+fi
+iocage create --release $base --name $name
+iocage start $name
+jail=$(zfs list -o mountpoint | grep -E /jails/$name/root$)
+cp -rvp ./* $jail/root
+iocage exec $name make -C ~ install
+iocage exec $name 'cd ~/aut && utz test'
+iocage exec $name 'make -C ~ clean && make -C ~ uninstall'
+iocage destroy -f $name
